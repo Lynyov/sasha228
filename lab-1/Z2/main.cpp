@@ -75,12 +75,11 @@ int main()
     }
 
     Table cipher(columns);
-    cout << "Выберите режим:\n";
+    do {
+        cout << "Выберите режим:\n";
         cout << "0 — выход\n";
         cout << "1 — шифрование\n";
         cout << "2 — расшифрование\n";
-    do {
-        cout << "Выберите режим (0 — выход, 1 — шифрование, 2 — расшифровка): ";
         if (!(cin >> mode)) return 0;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
