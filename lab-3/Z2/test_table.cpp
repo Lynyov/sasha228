@@ -22,22 +22,22 @@ wstring utf8ToWide(const string& s) {
 SUITE(ConstructorTest)
 {
     TEST(ValidKey) {
-        Table cipher(3);
-        CHECK_WIDE_EQUAL(L"ИТРРЕИПВМ", cipher.encrypt(L"ПРИВЕТМИР"));
+        Table cipher(2);
+        CHECK_WIDE_EQUAL(L"ААСШ", cipher.encrypt(L"САША"));
     }
     
     TEST(LongKey) {
-        Table cipher(10);
-        CHECK_WIDE_EQUAL(L"ТЕВИРП", cipher.encrypt(L"ПРИВЕТ"));
+        Table cipher(9);
+        CHECK_WIDE_EQUAL(L"КЕНАС", cipher.encrypt(L"САНЕК"));
     }
     
     TEST(KeyEqualsMessageLength) {
-        Table cipher(9);
-        CHECK_WIDE_EQUAL(L"РИМТЕВИРП", cipher.encrypt(L"ПРИВЕТМИР"));
+        Table cipher(4);
+        CHECK_WIDE_EQUAL(L"АШАС", cipher.encrypt(L"САША"));
     }
     
     TEST(NegativeKey) {
-        CHECK_THROW(Table cipher(-3), cipher_error);
+        CHECK_THROW(Table cipher(-4), cipher_error);
     }
     
     TEST(ZeroKey) {
@@ -49,7 +49,7 @@ struct Key3Fixture {
     Table* cipher;
     
     Key3Fixture() {
-        cipher = new Table(3);
+        cipher = new Table(2);
     }
     
     ~Key3Fixture() {
@@ -60,19 +60,19 @@ struct Key3Fixture {
 SUITE(EncryptTest)
 {
     TEST_FIXTURE(Key3Fixture, UpperCaseString) {
-        CHECK_WIDE_EQUAL(L"ИТРРЕИПВМ", cipher->encrypt(L"ПРИВЕТМИР"));
+        CHECK_WIDE_EQUAL(L"ААСШ", cipher->encrypt(L"САША"));
     }
     
     TEST_FIXTURE(Key3Fixture, LowerCaseString) {
-        CHECK_WIDE_EQUAL(L"ИТРРЕИПВМ", cipher->encrypt(L"приветмир"));
+        CHECK_WIDE_EQUAL(L"ААСШ", cipher->encrypt(L"саша"));
     }
     
     TEST_FIXTURE(Key3Fixture, StringWithWhitespace) {
-        CHECK_WIDE_EQUAL(L"ИТРРЕИПВМ", cipher->encrypt(L"ПРИВЕТ МИР"));
+        CHECK_WIDE_EQUAL(L"ААСШЯ", cipher->encrypt(L"САША Я"));
     }
     
     TEST_FIXTURE(Key3Fixture, StringWithNumbers) {
-        CHECK_WIDE_EQUAL(L"ИТРЕПВ", cipher->encrypt(L"ПРИВЕТ"));
+        CHECK_WIDE_EQUAL(L"ААСШ", cipher->encrypt(L"САША1"));
     }
     
     TEST_FIXTURE(Key3Fixture, EmptyString) {
@@ -80,35 +80,35 @@ SUITE(EncryptTest)
     }
     
     TEST_FIXTURE(Key3Fixture, NoLetters) {
-        CHECK_THROW(cipher->encrypt(L"1234"), cipher_error);
+        CHECK_THROW(cipher->encrypt(L"111"), cipher_error);
     }
     
     TEST(KeyEqualsOne) {
         Table cipher(1);
-        CHECK_WIDE_EQUAL(L"ПРИВЕТМИР", cipher.encrypt(L"ПРИВЕТМИР"));
+        CHECK_WIDE_EQUAL(L"САША", cipher.encrypt(L"САША"));
     }
     
     TEST_FIXTURE(Key3Fixture, StringWithPunctuation) {
-        CHECK_WIDE_EQUAL(L"ИТРРЕИПВМ", cipher->encrypt(L"ПРИВЕТ, МИР"));
+        CHECK_WIDE_EQUAL(L"ААЯСШМУ", cipher->encrypt(L"САША,МЯУ"));
     }
 }
 
 SUITE(DecryptTest)
 {
     TEST_FIXTURE(Key3Fixture, UpperCaseString) {
-        CHECK_WIDE_EQUAL(L"ПРИВЕТМИР", cipher->decrypt(L"ИТРРЕИПВМ"));
+        CHECK_WIDE_EQUAL(L"САША", cipher->decrypt(L"ААСШ"));
     }
     
     TEST_FIXTURE(Key3Fixture, LowerCaseString) {
-        CHECK_THROW(cipher->decrypt(L"итреиПВМ"), cipher_error);
+        CHECK_THROW(cipher->decrypt(L"Саша"), cipher_error);
     }
     
     TEST_FIXTURE(Key3Fixture, WhitespaceString) {
-        CHECK_THROW(cipher->decrypt(L"ИТР РЕИ ПВМ"), cipher_error);
+        CHECK_THROW(cipher->decrypt(L"САША Я"), cipher_error);
     }
     
     TEST_FIXTURE(Key3Fixture, DigitsString) {
-        CHECK_THROW(cipher->decrypt(L"ИТРЕПВ2024"), cipher_error);
+        CHECK_THROW(cipher->decrypt(L"САША1"), cipher_error);
     }
     
     TEST_FIXTURE(Key3Fixture, EmptyString) {
@@ -116,16 +116,16 @@ SUITE(DecryptTest)
     }
     
     TEST_FIXTURE(Key3Fixture, NoLettersDecrypt) {
-        CHECK_THROW(cipher->decrypt(L"1234"), cipher_error);
+        CHECK_THROW(cipher->decrypt(L"111"), cipher_error);
     }
     
     TEST(KeyEqualsOneDecrypt) {
         Table cipher(1);
-        CHECK_WIDE_EQUAL(L"ПРИВЕТМИР", cipher.decrypt(L"ПРИВЕТМИР"));
+        CHECK_WIDE_EQUAL(L"САША", cipher.decrypt(L"САША"));
     }
     
     TEST_FIXTURE(Key3Fixture, ValidCipherText) {
-        CHECK_WIDE_EQUAL(L"ПРИВЕТМИР", cipher->decrypt(L"ИТРРЕИПВМ"));
+        CHECK_THROW(cipher->decrypt(L"САША,МЯУ"), cipher_error);
     }
 }
 
