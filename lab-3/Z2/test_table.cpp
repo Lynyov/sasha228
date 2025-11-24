@@ -83,13 +83,22 @@ SUITE(EncryptTest)
         CHECK_THROW(cipher->encrypt(L"111"), cipher_error);
     }
     
-    TEST(KeyEqualsOne) {
-        Table cipher(1);
-        CHECK_WIDE_EQUAL(L"САША", cipher.encrypt(L"САША"));
-    }
-    
     TEST_FIXTURE(Key3Fixture, StringWithPunctuation) {
         CHECK_WIDE_EQUAL(L"ААЯСШМУ", cipher->encrypt(L"САША,МЯУ"));
+    }
+    
+    TEST_FIXTURE(Key3Fixture, ShortString) {
+        CHECK_WIDE_EQUAL(L"С", cipher->encrypt(L"С"));
+    }
+    
+    TEST(NonMultipleKeyLength) {
+        Table cipher(4);
+        CHECK_WIDE_EQUAL(L"КДЕНЛААСР", cipher.encrypt(L"АЛЕКСАНДР"));
+    }
+    
+    TEST(NonMultipleKeyLength2) {
+        Table cipher(10);
+        CHECK_WIDE_EQUAL(L"РДНАСКЕЛА", cipher.encrypt(L"АЛЕКСАНДР"));
     }
 }
 
@@ -119,13 +128,23 @@ SUITE(DecryptTest)
         CHECK_THROW(cipher->decrypt(L"111"), cipher_error);
     }
     
-    TEST(KeyEqualsOneDecrypt) {
-        Table cipher(1);
-        CHECK_WIDE_EQUAL(L"САША", cipher.decrypt(L"САША"));
-    }
     
     TEST_FIXTURE(Key3Fixture, ValidCipherText) {
         CHECK_THROW(cipher->decrypt(L"САША,МЯУ"), cipher_error);
+    }
+    
+    TEST_FIXTURE(Key3Fixture, ShortString) {
+        CHECK_WIDE_EQUAL(L"С", cipher->decrypt(L"С"));
+    }
+    
+    TEST(NonMultipleKeyLengthDecrypt) {
+        Table cipher(4);
+        CHECK_WIDE_EQUAL(L"АЛЕКСАНДР", cipher.decrypt(L"КДЕНЛААСР"));
+    }
+    
+    TEST(NonMultipleKeyLengthDecrypt2) {
+        Table cipher(10);
+        CHECK_WIDE_EQUAL(L"АЛЕКСАНДР", cipher.decrypt(L"РДНАСКЕЛА"));
     }
 }
 
